@@ -1,0 +1,81 @@
+<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Programming From Zero</title>
+<style>
+:root{--bg:#0b1020;--p:#121a33;--c:#1b2547;--t:#e6ecff;--m:#93a0c8;--a:#00e5ff;--b:#7c4dff;--ok:#2ee59d;--no:#ff5c7a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:17px/1.9 Tahoma,Segoe UI,sans-serif;display:flex;min-height:100vh}
+#sb{width:270px;background:var(--p);padding:18px;position:fixed;top:0;bottom:0;right:0;overflow:auto;z-index:5;transition:.3s}
+#sb h1{font-size:20px;margin:0 0 4px;background:linear-gradient(90deg,var(--a),var(--b));-webkit-background-clip:text;color:transparent;direction:ltr;text-align:center}
+.bar{height:8px;background:var(--c);border-radius:9px;margin:10px 0 4px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--a),var(--b));transition:.5s}
+#sb button{display:block;width:100%;text-align:right;background:none;border:0;color:var(--t);padding:10px 12px;border-radius:10px;margin:3px 0;cursor:pointer;font:inherit;font-size:15px}
+#sb button:hover,#sb button.on{background:var(--c)}#sb button.d::after{content:" ✅"}
+main{margin-right:270px;padding:28px;max-width:960px;width:100%;animation:f .5s}
+@keyframes f{from{opacity:0;transform:translateY(14px)}}
+h2{font-size:28px;margin-top:0}h3{color:var(--a)}.card{background:var(--p);border:1px solid var(--c);border-radius:16px;padding:18px;margin:16px 0}
+code,pre,textarea,.en{font-family:Consolas,monospace;direction:ltr}pre,textarea{background:#060a16;color:#9dffb0;border-radius:12px;padding:12px;width:100%;text-align:left;margin:8px 0;white-space:pre-wrap}
+textarea{height:170px;border:1px solid var(--c);font-size:15px}
+.btn{background:linear-gradient(90deg,var(--a),var(--b));color:#000;border:0;border-radius:10px;padding:9px 20px;font:inherit;font-weight:bold;cursor:pointer}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.g button,.st button{background:var(--c);color:var(--t);border:2px solid transparent;border-radius:14px;padding:14px;font:inherit;cursor:pointer;transition:.2s}
+.g button:hover,.g button.on,.st button.on{border-color:var(--a);transform:translateY(-3px);box-shadow:0 0 18px #00e5ff44}
+.g b{display:block;font-size:30px}.info{background:#0d3a4a55;border-right:4px solid var(--a);padding:12px;border-radius:10px;margin-top:12px;min-height:50px}
+.st{display:flex;flex-direction:column;align-items:center;gap:4px}.st button{width:min(340px,100%)}.st span{color:var(--a);animation:bn 1s infinite}@keyframes bn{50%{transform:translateY(5px)}}
+.bits{display:flex;gap:6px;direction:ltr;justify-content:center;flex-wrap:wrap}.bits button{width:52px;height:64px;border-radius:10px;border:1px solid var(--a);background:var(--c);color:var(--t);cursor:pointer;font:bold 20px Consolas}.bits button.on{background:var(--a);color:#000}
+input[type=number]{background:#060a16;color:var(--t);border:1px solid var(--a);border-radius:10px;padding:8px;font-size:18px;width:120px}
+.q{margin:14px 0}.q label{display:block;padding:6px 10px;border-radius:8px;cursor:pointer}.q label:hover{background:var(--c)}.ok{color:var(--ok)}.no{color:var(--no)}
+#mb{display:none;position:fixed;top:10px;right:10px;z-index:9;background:var(--b);color:#fff;border:0;border-radius:10px;padding:8px 14px;font-size:20px}
+@media(max-width:800px){#sb{transform:translateX(100%)}#sb.o{transform:none}main{margin:0;padding:60px 14px 20px}#mb{display:block}}
+</style></head><body>
+<button id="mb" onclick="sb.classList.toggle('o')">☰</button>
+<nav id="sb"><h1>Programming From Zero</h1><div class="bar"><i id="pb"></i></div><small id="pt" style="color:var(--m)"></small><div id="nv" style="margin-top:10px"></div></nav>
+<main id="mn"></main>
+<script>
+const $=id=>document.getElementById(id);
+let done={};try{done=JSON.parse(localStorage.getItem('pfz')||'{}')}catch(e){}
+const save=()=>{try{localStorage.setItem('pfz',JSON.stringify(done))}catch(e){}};
+const parts=[["🧠","CPU (المعالج)","ده مخ الكمبيوتر. بينفّذ الأوامر واحد ورا التاني بسرعة مليارات المرات في الثانية. تخيله طباخ شاطر بيقرأ الوصفة وينفذها."],
+["⚡","RAM (الذاكرة العشوائية)","ذاكرة مؤقتة سريعة. بتشيل البرامج اللي شغالة دلوقتي. زي سطح مكتبك: كل ما كبر، تشتغل على حاجات أكتر مع بعض. لما تفصل الكهرباء بتتمسح."],
+["💾","Hard Disk / SSD (التخزين)","بيحفظ ملفاتك وبرامجك حتى لو الجهاز اتقفل. HDD فيه اسطوانة بتلف (أبطأ)، وSSD شرايح إلكترونية (أسرع بكتير). ده زي الدولاب اللي بتخزن فيه هدومك."],
+["🔌","Motherboard (اللوحة الأم)","اللوحة اللي كل القطع بتتركب عليها وبتوصّلهم ببعض. زي شوارع المدينة اللي بتربط البيوت ببعض."],
+["⌨️","Input Devices (أجهزة الإدخال)","اللي بتدخل بيها معلومات للجهاز: كيبورد، ماوس، ميكروفون، كاميرا."],
+["🖥️","Output Devices (أجهزة الإخراج)","اللي بتطلّع النتيجة: شاشة، سماعات، طابعة."],
+["🧩","Hardware vs Software","Hardware هو الأجزاء اللي بتلمسها (الجسم). Software هو البرامج (الروح) زي ويندوز والألعاب. من غير برامج الجهاز مجرد حديد."]];
+const stages=[["👨‍💻","المبرمج","بيكتب فكرته بلغة قريبة من الإنجليزي، زي: اطبع كلمة أهلاً."],
+["📝","Code Editor","البرنامج اللي بتكتب فيه الكود وبيلوّنه وينبهك للأخطاء، زي Word للمبرمجين."],
+["🔄","Compiler / Interpreter","المترجم. Compiler بيترجم الكود كله مرة واحدة قبل التشغيل (C, C++). Interpreter بيترجم ويشغل سطر سطر (Python, JavaScript). زي مترجم فوري بيترجم كلامك جملة جملة. (Assembler بيحوّل لغة Assembly لكود الآلة)."],
+["🔢","Machine Code","أصفار وواحدات (Binary) بس. ده الشيء الوحيد اللي المعالج يفهمه."],
+["🧠","CPU","بينفذ التعليمات: يجيب التعليمة (Fetch)، يفهمها (Decode)، ينفذها (Execute) ويكرر بسرعة مهولة."],
+["✨","Final Output","النتيجة اللي بتشوفها: كلام على الشاشة، صوت، لعبة شغالة."]];
+const langs=[["C","لغة قديمة وسريعة جداً. بتتعمل بيها أنظمة التشغيل والأجهزة الصغيرة."],["C++","نسخة أقوى من C. للألعاب الكبيرة والبرامج الثقيلة."],["C#","من مايكروسوفت. للألعاب (Unity) وبرامج ويندوز وتطبيقات الويب."],["Java","شغالة على أجهزة كتير. تطبيقات أندرويد والأنظمة الكبيرة والبنوك."],["Python","سهلة جداً وقريبة من الإنجليزي. للذكاء الاصطناعي وتحليل البيانات والأتمتة. أنسب بداية للمبتدئ."],["JavaScript","لغة المواقع. اللي بتخلي الصفحة تتحرك وتتفاعل، وشغالة في أي متصفح."],["PHP","لغة السيرفرات. بتشغل مواقع كتير زي WordPress."]];
+const Q=(q,o,a,e)=>({q,o,a,e});
+const L=[
+{t:"الكمبيوتر بيشتغل إزاي؟",h:`<p>الكمبيوتر آلة غبية وسريعة جداً: بتنفذ اللي تقوله بالحرف. عشان نفهمه لازم نعرف مكوناته. <b>اضغط على أي مكون</b> تحت:</p><div class="card"><div class="g" id="w"></div><div class="info" id="wi">اختار مكون 👆</div></div><div class="card"><h3>إزاي بيشتغلوا مع بعض؟</h3><p>تدوس على كيبورد (Input) ← CPU يفهم الأمر ← يجيب البرنامج من SSD يحطه في RAM ← النتيجة تظهر على الشاشة (Output). كل ده بيتم على Motherboard.</p></div>`,init(){$('w').innerHTML=parts.map((p,i)=>`<button onclick="pick(${i},this)"><b>${p[0]}</b>${p[1].split(' (')[0]}</button>`).join('')},
+q:[Q("إيه مخ الكمبيوتر؟",["RAM","CPU","الشاشة"],1,"CPU هو اللي بينفذ الأوامر."),Q("الـ RAM بتحفظ البيانات حتى بعد الفصل؟",["أيوه","لأ"],1,"RAM مؤقتة وبتتمسح مع الكهرباء."),Q("أسرع نوع تخزين؟",["HDD","SSD","CD"],1,"SSD من غير أجزاء متحركة."),Q("الماوس نوعه؟",["Input","Output"],0,"بيدخل أوامر للجهاز."),Q("اللوحة اللي بتوصل القطع ببعض؟",["Motherboard","Printer","Router"],0,"Motherboard هي الأساس.")]},
+{t:"الكمبيوتر بيفهم إيه؟",h:`<p>الكمبيوتر معندوش حروف ولا كلام، بيفهم حاجتين بس: <b>0 و 1</b>. ليه؟ لأن الكهرباء ليها حالتين: شغالة (1) أو مقطوعة (0)، زي مفتاح النور بالظبط. ده اسمه <b class="en">Binary System</b> (النظام الثنائي).</p><p><b>Bit</b> = رقم واحد (0 أو 1). <b>Byte</b> = 8 bits مع بعض. وأي حاجة بتعملها (صورة، أغنية) أصلها أصفار وواحدات، وده اسمه <b>Machine Language</b> (لغة الآلة).</p><div class="card"><h3>جرب بإيدك: اضغط على الـ bits</h3><div class="bits" id="bt"></div><p style="text-align:center">الناتج: <b id="bv">0</b></p></div><div class="card"><h3>محول Decimal ← Binary</h3><input type="number" id="dn" min="0" max="255" value="13" oninput="conv()"><pre id="dr"></pre></div>`,init(){const b=$('bt');[128,64,32,16,8,4,2,1].forEach(v=>{const e=document.createElement('button');e.innerHTML='0<br><small>'+v+'</small>';e.dataset.v=v;e.onclick=()=>{e.classList.toggle('on');e.firstChild.nodeValue=e.classList.contains('on')?'1':'0';$('bv').textContent=[...b.children].reduce((s,x)=>s+(x.classList.contains('on')?+x.dataset.v:0),0)};b.appendChild(e)});conv()},
+q:[Q("الكمبيوتر بيفهم؟",["حروف","0 و 1","صور"],1,"Binary فقط."),Q("الـ Byte يساوي؟",["4 bits","8 bits","10 bits"],1,"Byte = 8 bits."),Q("الرقم 5 في Binary؟",["101","110","11"],0,"4+1 = 5."),Q("ليه 0 و 1؟",["الكهرباء ليها حالتين","موضة","أسهل في الكتابة"],0,"شغال / مقطوع."),Q("Bit معناها؟",["رقم ثنائي واحد","ملف","برنامج"],0,"أصغر وحدة بيانات.")]},
+{t:"المبرمج بيكتب الكود فين؟",h:`<p><b class="en">Code Editor</b> برنامج لكتابة الكود. <b class="en">IDE</b> نسخة متكاملة فيها تشغيل وتصحيح أخطاء. وأشهر واحد مجاني هو <b class="en">Visual Studio Code</b>.</p><p><b class="en">Syntax</b> (قواعد الكتابة) زي قواعد اللغة: لو غلطت فاصلة الكمبيوتر مش هيفهم. <b class="en">Variable</b> (متغير) علبة بتحط فيها قيمة وليها اسم. <b class="en">Function</b> (دالة) وصفة بتتكرر بسطر واحد.</p><div class="card"><h3>جرب JavaScript هنا</h3><textarea id="ed" spellcheck="false">let name = "أحمد";        // متغير
+function hello(n){        // دالة
+  return "أهلاً يا " + n;
+}
+console.log(hello(name));
+console.log(2 + 3);</textarea><button class="btn" onclick="run()">▶ شغّل</button><pre id="eo">النتيجة هتظهر هنا</pre></div>`,
+q:[Q("المتغير زي؟",["علبة عليها اسم","شاشة","كيبورد"],0,"بيخزن قيمة."),Q("أشهر محرر مجاني؟",["VS Code","Photoshop","Excel"],0,"Visual Studio Code."),Q("الدالة Function؟",["كود قابل لإعادة الاستخدام","رقم","خطأ"],0,"بتكتبها مرة وتناديها كتير."),Q("Syntax يعني؟",["قواعد كتابة اللغة","سرعة النت","نوع كمبيوتر"],0,"زي القواعد النحوية."),Q("IDE بتزيد على المحرر؟",["تشغيل وتصحيح","ألعاب","موسيقى"],0,"بيئة تطوير متكاملة.")]},
+{t:"رحلة الكود للكمبيوتر",h:`<p>الكود بتاعك مش بيروح للمعالج مباشرة. <b>اضغط على كل مرحلة</b>:</p><p><b>High-Level</b> لغة قريبة من الإنسان (Python). <b>Low-Level</b> قريبة من الجهاز (Assembly).</p><div class="card"><div class="st" id="sg"></div><div class="info" id="si">اضغط على مرحلة 👆</div></div>`,init(){$('sg').innerHTML=stages.map((s,i)=>`<button onclick="stg(${i},this)">${s[0]} ${s[1]}</button>${i<5?'<span>⬇️</span>':''}`).join('')},
+q:[Q("المترجم الفوري سطر سطر؟",["Compiler","Interpreter"],1,"Interpreter."),Q("المعالج بيفهم؟",["Machine Code","Python","عربي"],0,"أصفار وواحدات."),Q("Python لغة؟",["High-Level","Low-Level"],0,"قريبة من الإنسان."),Q("Compiler بيترجم؟",["الكود كله قبل التشغيل","سطر سطر"],0,"مرة واحدة."),Q("خطوات CPU؟",["Fetch Decode Execute","Copy Paste","Save Load"],0,"يجيب، يفهم، ينفذ.")]},
+{t:"أول تجربة برمجية",h:`<p><b class="en">Programming</b> يعني تكتب خطوات واضحة للكمبيوتر ينفذها. زي وصفة أكل. أول برنامج في الدنيا اسمه <b class="en">Hello World</b>:</p><pre id="hw">console.log("Hello World");</pre><div class="card"><h3>شرح سطر بسطر</h3><p><code>console.log</code>: الأمر اللي معناه اطبع.<br><code>( )</code>: بنحط جواها اللي عايزين نطبعه.<br><code>"Hello World"</code>: النص بين علامتي تنصيص.<br><code>;</code>: نهاية السطر.</p><button class="btn" onclick="hw()">▶ شغّل</button><pre id="ho"></pre></div><div class="card"><h3>Errors و Debugging</h3><p><b>Error</b> (خطأ) طبيعي جداً حتى عند المحترفين. جرب تكتب <code>console.lg("Hi")</code> في المحرر. <b>Debugging</b> يعني تقرأ رسالة الخطأ وتلاقي السبب وتصلحه. نصيحة: اقرأ الرسالة، هي بتقولك المشكلة!</p><button class="btn" onclick="bad()">جرب كود فيه خطأ</button><pre id="be"></pre></div>`,
+q:[Q("أول برنامج؟",["Hello World","Game","Virus"],0,"تقليد البداية."),Q("الأمر اللي بيطبع؟",["console.log","run","stop"],0,"بيعرض على الشاشة."),Q("Debugging؟",["تصحيح الأخطاء","حذف الكود","نسخه"],0,"تدور على الخطأ وتصلحه."),Q("الخطأ في البرمجة؟",["طبيعي","كارثة"],0,"كلنا بنغلط."),Q("النص بيتكتب؟",["بين تنصيص","بدون علامات"],0,"\"...\" ")]},
+{t:"أشهر لغات البرمجة",h:`<p>كل لغة ليها تخصص، زي الأدوات: مفك ومطرقة. اضغط على كل لغة:</p><div class="card"><div class="g en" id="lg"></div><div class="info" id="li">اختار لغة 👆</div></div>`,init(){$('lg').innerHTML=langs.map((l,i)=>`<button onclick="lng(${i},this)"><b>{ }</b>${l[0]}</button>`).join('')},
+q:[Q("أنسب لغة للمبتدئ؟",["Python","C++"],0,"سهلة وقريبة من الإنجليزي."),Q("لغة المواقع في المتصفح؟",["JavaScript","C"],0,"شغالة في أي متصفح."),Q("Unity مع؟",["C#","PHP"],0,"C# للألعاب."),Q("WordPress مكتوب بـ؟",["PHP","Java"],0,"PHP."),Q("أندرويد تقليدياً؟",["Java","Python"],0,"Java.")]}
+];
+let cur=0;
+function nav(){$('nv').innerHTML=L.map((l,i)=>`<button class="${i==cur?'on':''} ${done[i]?'d':''}" onclick="go(${i})">${i+1}. ${l.t}</button>`).join('');const n=Object.keys(done).length;$('pb').style.width=n/L.length*100+'%';$('pt').textContent=`التقدم: ${n} من ${L.length} دروس`}
+function go(i){cur=i;sb.classList.remove('o');const l=L[i];$('mn').innerHTML=`<h2>الدرس ${i+1}: ${l.t}</h2>${l.h}<div class="card"><h3>📝 اختبار الدرس</h3><div id="qz">${l.q.map((q,k)=>`<div class="q"><b>${k+1}. ${q.q}</b>${q.o.map((o,j)=>`<label><input type="radio" name="q${k}" value="${j}"> ${o}</label>`).join('')}<div id="e${k}"></div></div>`).join('')}</div><button class="btn" onclick="grade()">اعرف النتيجة</button><h3 id="sc"></h3></div><button class="btn" onclick="go(${Math.min(i+1,L.length-1)});scrollTo(0,0)">الدرس التالي ←</button>`;if(l.init)l.init();nav();scrollTo(0,0)}
+function grade(){let s=0;L[cur].q.forEach((q,k)=>{const c=document.querySelector(`input[name=q${k}]:checked`),ok=c&&+c.value==q.a;if(ok)s++;$('e'+k).innerHTML=`<span class="${ok?'ok':'no'}">${ok?'✔ صح':'✘ غلط، الصح: '+q.o[q.a]}</span> — ${q.e}`});$('sc').textContent=`نتيجتك: ${s} / 5 ${s>=4?'🎉':s>=3?'👍':'🔁 راجع الدرس وجرب تاني'}`;if(s>=3){done[cur]=1;save();nav()}}
+function pick(i,b){document.querySelectorAll('#w button').forEach(x=>x.classList.remove('on'));b.classList.add('on');$('wi').innerHTML=`<b>${parts[i][1]}</b><br>${parts[i][2]}`}
+function stg(i,b){document.querySelectorAll('#sg button').forEach(x=>x.classList.remove('on'));b.classList.add('on');$('si').innerHTML=`<b>${stages[i][1]}</b><br>${stages[i][2]}`}
+function lng(i,b){document.querySelectorAll('#lg button').forEach(x=>x.classList.remove('on'));b.classList.add('on');$('li').innerHTML=`<b>${langs[i][0]}</b><br>${langs[i][1]}`}
+function conv(){let n=parseInt($('dn').value);if(isNaN(n)||n<0||n>255){$('dr').textContent='اكتب رقم من 0 لـ 255';return}let t='',x=n;if(!x)t='0 ÷ 2 = 0\n';while(x>0){t+=`${x} ÷ 2 = ${x>>1}  الباقي ${x%2}\n`;x>>=1}$('dr').textContent=t+`\nنقرأ الباقي من تحت لفوق:\n${n} = ${n.toString(2).padStart(8,'0')}`}
+function exec(code){const o=[],c={log:(...a)=>o.push(a.join(' '))};try{new Function('console',code)(c)}catch(e){o.push('❌ Error: '+e.message)}return o.join('\n')||'(مفيش نتيجة)'}
+function run(){$('eo').textContent=exec($('ed').value)}
+function hw(){$('ho').textContent=exec($('hw').textContent)}
+function bad(){$('be').textContent=exec('console.lg("Hi")')+'\n\nالمعنى: lg مش موجودة. المقصود log. صلّحها وجرب!'}
+go(Object.keys(done).length<L.length?Math.min(Object.keys(done).length,L.length-1):0);
+</script></body></html>
